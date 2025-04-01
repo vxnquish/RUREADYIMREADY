@@ -1,0 +1,38 @@
+.recommend-container {
+  padding: 2rem;
+  font-family: 'Apple SD Gothic Neo', sans-serif;
+}
+.locations button {
+  margin: 0.3rem;
+  background: #f0f0f0;
+  border: 1px solid #bbb;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.input-group {
+  margin-top: 1rem;
+}
+.input-group input {
+  padding: 0.5rem;
+  width: 250px;
+}
+.input-group button {
+  margin-left: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+.recommend-list {
+  margin-top: 1.2rem;
+  padding-left: 1.2rem;
+}
+.recommend-list li {
+  margin-bottom: 1.2rem;
+  background: #f4f4f4;
+  padding: 0.6rem;
+  border-radius: 8px;
+}
+.no-result {
+  margin-top: 1rem;
+  font-style: italic;
+  color: gray;
+}

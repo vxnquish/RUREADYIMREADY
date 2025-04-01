@@ -8,6 +8,17 @@
 - 기능 2: AI 추천 시스템
 - 기능 3: GitHub 연동 자동화 (예: Actions)
 
+## How to Run
+- Backend 실행
+cd backend (backend 폴더로 이동)
+mvn clean install
+mvn spring-boot:run
+
+- Frontend 실행
+cd frontend (frontend 폴더로 이동)
+npm install
+npm run dev
+
 ## 🖥️ 기술 스택
 - Frontend:
 - Backend:
