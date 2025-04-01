@@ -3,20 +3,21 @@ import { fetchRecommendation } from '../api/flask';
 
 export default function Recommend() {
   const [location, setLocation] = useState('');
-  const [result, setResult] = useState([]);
+  const [results, setResults] = useState([]);
 
   const handleSearch = async () => {
+    if (!location) return;
     const res = await fetchRecommendation(location);
-    setResult(res.result);
+    setResults(res.result);
   };
 
   return (
     <div>
-      <h1>데이트 코스 추천 🗺️</h1>
-      <input value={location} onChange={e => setLocation(e.target.value)} placeholder="지역을 입력하세요 (예: 서울)" />
+      <h2>🗺️ 데이트 코스 추천</h2>
+      <input value={location} onChange={e => setLocation(e.target.value)} placeholder="예: 서울, 부산" />
       <button onClick={handleSearch}>추천 받기</button>
       <ul>
-        {result.map((item, idx) => <li key={idx}>{item}</li>)}
+        {results.map((r, i) => <li key={i}>{r}</li>)}
       </ul>
     </div>
   );
