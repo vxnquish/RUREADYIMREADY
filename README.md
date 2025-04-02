@@ -30,6 +30,16 @@
 
 ## 🚀 실행 방법
 
+### 🔹 백엔드 실행 (Java + Spring Boot)
+
+```bash
+cd backend
+mvn clean install
+mvn spring-boot:run
+```
+
+API 접속 주소: [http://localhost:8080](http://localhost:8080)
+
 ### 🔹 프론트엔드 실행
 
 ```bash
@@ -39,15 +49,6 @@ npm run dev
 ```
 
 접속 주소: [http://localhost:5173](http://localhost:5173)
-
-### 🔹 백엔드 실행 (Java + Spring Boot)
-
-```bash
-cd backend
-./mvnw spring-boot:run
-```
-
-API 접속 주소: [http://localhost:8080](http://localhost:8080)
 
 ---
 
