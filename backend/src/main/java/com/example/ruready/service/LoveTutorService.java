@@ -1,34 +1,126 @@
-// ✅ LoveTutorService.java - 더 다양한 연애 조언 추가
 package com.example.ruready.service;
 
+import com.google.gson.*;
+import okhttp3.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service
 public class LoveTutorService {
 
     public String getAdvice(String message) {
-        String lower = message.toLowerCase();
+        return getAdviceFromTogether(message); // Groq 또는 Together 중 하나로 선택
+    }
 
-        if (lower.contains("짝사랑")) {
-            return "짝사랑은 설레지만 아픈 감정이에요. 진심을 전할 용기를 내보는 건 어때요? 💌";
-        } else if (lower.contains("고백")) {
-            return "고백은 타이밍과 분위기가 중요해요. 상대방이 편안한 순간을 노려보세요 😊";
-        } else if (lower.contains("이별")) {
-            return "이별은 누구에게나 힘든 일이에요. 너무 자책하지 말고 자신을 돌보는 시간을 가져보세요 💔";
-        } else if (lower.contains("썸")) {
-            return "썸은 서로의 관심이 피어나는 시간이에요. 가볍게 커피 한 잔 제안해보는 건 어떨까요? ☕";
-        } else if (lower.contains("데이트")) {
-            return "데이트는 함께하는 시간이 가장 중요해요. 작은 이벤트나 산책도 좋은 추억이 될 수 있어요 💑";
-        } else if (lower.contains("연애")) {
-            return "연애는 서로의 다름을 이해하고 존중하는 과정이에요. 대화로 마음을 자주 나눠보세요 ❤️";
-        } else if (lower.contains("장거리")) {
-            return "장거리 연애는 신뢰와 소통이 핵심이에요. 규칙적인 연락과 서프라이즈가 큰 힘이 돼요 📱";
-        } else if (lower.contains("연락")) {
-            return "상대방이 자주 연락을 하지 않는다면, 이유를 물어보는 대화가 필요할 수도 있어요 📞";
-        } else if (lower.contains("권태기")) {
-            return "권태기는 대부분의 연인들이 겪어요. 새로운 추억을 만들거나, 잠시 거리두기도 도움이 될 수 있어요 🔄";
-        } else {
-            return "그 고민에 대해 조금 더 자세히 이야기해줄래요? 함께 고민해볼게요 😌";
+    @Value("${externals.grog.apikey}")
+    private String externalGrogApiKey;
+
+    @Value("${externals.grog.model}")
+    private String externalGrogModel;
+
+    public String getAdviceFromGroq(String message) {
+        OkHttpClient client = new OkHttpClient();
+
+        String apiKey = externalGrogApiKey;
+        String model = externalGrogModel;
+
+        JsonObject requestBody = new JsonObject();
+        requestBody.addProperty("model", model);
+        requestBody.addProperty("stream", false); // Groq은 명시적으로 stream: false가 필요할 수 있음
+
+        JsonArray messages = new JsonArray();
+
+        JsonObject system = new JsonObject();
+        system.addProperty("role", "system");
+        system.addProperty("content", "너는 연애 상담 전문가야. 고민에 공감하며 현실적인 연애 조언을 짧고 따뜻하게 해줘.");
+        messages.add(system);
+
+        JsonObject user = new JsonObject();
+        user.addProperty("role", "user");
+        user.addProperty("content", message);
+        messages.add(user);
+
+        requestBody.add("messages", messages);
+
+        Request request = new Request.Builder()
+                .url("https://api.groq.com/openai/v1/chat/completions")
+                .header("Authorization", "Bearer " + apiKey)
+                .header("Content-Type", "application/json")
+                .post(RequestBody.create(requestBody.toString(), MediaType.get("application/json")))
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body().string();
+            System.out.println("📥 Groq 응답 원문: " + responseBody); // 디버깅 출력
+
+            if (response.isSuccessful()) {
+                JsonObject json = JsonParser.parseString(responseBody).getAsJsonObject();
+                return json.getAsJsonArray("choices")
+                        .get(0).getAsJsonObject()
+                        .getAsJsonObject("message")
+                        .get("content").getAsString().trim();
+            } else {
+                return "❗️ Groq 응답 오류: " + response.code() + " - " + responseBody;
+            }
+        } catch (IOException e) {
+            return "❗️ 네트워크 오류 발생: " + e.getMessage();
         }
     }
+
+    @Value("${externals.together.apikey}")
+    private String externalTogetherApiKey;
+
+    @Value("${externals.together.model}")
+    private String externalTogetherModel;
+
+    public String getAdviceFromTogether(String message) {
+        OkHttpClient client = new OkHttpClient();
+
+        String apiKey = externalTogetherApiKey;
+        String model = externalTogetherModel;
+
+        JsonObject requestBody = new JsonObject();
+        requestBody.addProperty("model", model);
+
+        JsonArray messages = new JsonArray();
+
+        JsonObject system = new JsonObject();
+        system.addProperty("role", "system");
+        system.addProperty("content", "너는 연애 상담 전문가야. 공감하면서 현실적이고 따뜻한 조언을 해줘.");
+        messages.add(system);
+
+        JsonObject user = new JsonObject();
+        user.addProperty("role", "user");
+        user.addProperty("content", message);
+        messages.add(user);
+
+        requestBody.add("messages", messages);
+
+        Request request = new Request.Builder()
+                .url("https://api.together.xyz/v1/chat/completions")
+                .header("Authorization", "Bearer " + apiKey)
+                .header("Content-Type", "application/json")
+                .post(RequestBody.create(requestBody.toString(), MediaType.get("application/json")))
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body().string();
+            System.out.println("📥 Together 응답 원문: " + responseBody);
+
+            if (response.isSuccessful()) {
+                JsonObject json = JsonParser.parseString(responseBody).getAsJsonObject();
+                return json.getAsJsonArray("choices")
+                        .get(0).getAsJsonObject()
+                        .getAsJsonObject("message")
+                        .get("content").getAsString().trim();
+            } else {
+                return "❗️ Together 응답 오류: " + response.code() + " - " + responseBody;
+            }
+        } catch (IOException e) {
+            return "❗️ 네트워크 오류 발생: " + e.getMessage();
+        }
+    }
+
 }

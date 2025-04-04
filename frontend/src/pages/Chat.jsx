@@ -9,7 +9,7 @@ export default function Chat() {
   const [history, setHistory] = useState([]);
 
   const handleSend = async () => {
-    if (!message) return;
+    if (!message.trim()) return;
     const res = await askLoveAdvice(message);
     const newEntry = {
       question: message,
@@ -21,17 +21,22 @@ export default function Chat() {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') handleSend();
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault(); // 줄바꿈 방지
+      handleSend();
+    }
   };
 
   return (
     <div className="chat-container">
       <h2>💌 연애 상담</h2>
+
       <div className="keywords">
         {keywordHints.map((k, i) => (
           <button key={i} onClick={() => setMessage(k)}>{k}</button>
         ))}
       </div>
+
       <div className="input-group">
         <input
           value={message}
@@ -41,6 +46,7 @@ export default function Chat() {
         />
         <button onClick={handleSend}>상담 요청</button>
       </div>
+
       <ul className="history">
         {history.map((entry, i) => (
           <li key={i}>
