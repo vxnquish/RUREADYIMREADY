@@ -13,3 +13,6 @@ dist/
 
 # Maven build
 /target
+
+# etc
+backend_old/
