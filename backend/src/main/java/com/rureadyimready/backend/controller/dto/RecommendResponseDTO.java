@@ -8,5 +8,5 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class RecommendResponseDTO {
-    private List<String> recommendations;
+    private List<String> result;
 }
