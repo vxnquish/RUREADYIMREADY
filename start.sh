@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# 백엔드 실행
+# 백엔드 실행 (Gradle)
 cd backend
-mvn spring-boot:run &
+./gradlew bootRun &
 BACK_PID=$!
 
 # 프론트엔드 실행
