@@ -9,8 +9,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ForumRepository extends JpaRepository<ForumContent, Long> {
+    @Query("select f from ForumContent f join fetch f.forumTags t join fetch t.tags where f.id=:id")
+    Optional<ForumContent> findByIdWithTags(@Param(value = "id") long id);
     @Query("select new com.rureadyimready.backend.controller.dto.ForumTitleDTO(f.id, f.title, f.createdAt)" +
             "from ForumContent f")
     Page<ForumTitleDTO> findAllWithoutContent(Pageable pageable);
@@ -24,4 +28,7 @@ public interface ForumRepository extends JpaRepository<ForumContent, Long> {
             "from ForumContent f where f.title like concat('%', :content, '%') or f.content like concat('%', :content, '%')")
     Page<ForumTitleDTO> findByTitleContainingAndContentContaining
             (@Param(value = "content") String content, Pageable pageable);
+    @Query("select new com.rureadyimready.backend.controller.dto.ForumTitleDTO(f.id, f.title, f.createdAt)" +
+            "from ForumTags ft join ft.forumContent f join ft.tags t where t.value=:tag")
+    Page<ForumTitleDTO> findByTagName(@Param(value = "tag") String tag, Pageable pageable);
 }

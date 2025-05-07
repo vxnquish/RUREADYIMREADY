@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -26,4 +27,10 @@ public class ForumContent {
     @CreatedDate
     @Column(nullable = false, updatable = false, scale = 6)
     private LocalDateTime createdAt;
+
+    @Setter
+    @OneToMany(mappedBy = "forumContent", cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<ForumTags> forumTags;
+
 }

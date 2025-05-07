@@ -1,14 +1,19 @@
 package com.rureadyimready.backend.controller;
 
-import com.rureadyimready.backend.controller.dto.ForumContentSaveDTO;
+import com.rureadyimready.backend.controller.dto.ForumContentDTO;
 import com.rureadyimready.backend.controller.dto.ForumResultDTO;
 import com.rureadyimready.backend.controller.dto.ForumSearchDTO;
 import com.rureadyimready.backend.controller.dto.ForumSearchMode;
-import com.rureadyimready.backend.domain.ForumContent;
+import com.rureadyimready.backend.domain.ForumTags;
 import com.rureadyimready.backend.service.ForumService;
+import com.rureadyimready.backend.service.TagsService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/forum")
@@ -16,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ForumController {
     private final ForumService forumService;
+    private final TagsService tagsService;
     public static final int DEFAULT_PAGE_SIZE = 15;
 
     /**
@@ -24,8 +30,8 @@ public class ForumController {
      * @return 게시글 전체(DTO로 바꿀 게 없어 원형 그대로 제공)
      */
     @GetMapping("/{id}")
-    public ForumContent findById(@PathVariable long id) {
-        return forumService.findById(id);
+    public ForumContentDTO findById(@PathVariable long id) {
+        return ForumContentDTO.fromEntity(forumService.findById(id));
     }
 
     /**
@@ -34,8 +40,14 @@ public class ForumController {
      * @return 등록된 게시글 정보, title 길이가 최대 길이를 넘으면 400 Bad Request 반환
      */
     @PostMapping("/save")
-    public ForumContent save(@RequestBody @Valid ForumContentSaveDTO forum) {
-        return forumService.save(forum.toEntity());
+    public Lid save(@RequestBody @Valid ForumContentDTO forum) {
+        return new Lid(forumService.save(forum).getId());
+    }
+
+    @Data
+    @AllArgsConstructor
+    class Lid {
+        long id;
     }
 
     /**
@@ -47,7 +59,7 @@ public class ForumController {
     public ForumResultDTO getList(@PathVariable int page, Integer size) {
         //size는 query parameter로 보내야 하며, 안 보내면 기본값 적용
         if (size == null) size = DEFAULT_PAGE_SIZE;
-        return forumService.findAll(page - 1, size);
+        return forumService.findAll(page, size);
     }
 
     @PostMapping("/search")
@@ -57,11 +69,18 @@ public class ForumController {
         if (search.getContent() == null) return getList(search.getPage(), search.getSize());
         else return switch (search.getMode()) {
             case TITLE ->
-                    forumService.findByTitle(search.getContent(), search.getPage() - 1, search.getSize());
+                    forumService.findByTitle(search.getContent(), search.getPage(), search.getSize());
             case CONTENT ->
-                    forumService.findByContent(search.getContent(), search.getPage() - 1, search.getSize());
+                    forumService.findByContent(search.getContent(), search.getPage(), search.getSize());
             case TITLE_AND_CONTENT ->
-                    forumService.findByTitleAndContent(search.getContent(), search.getPage() - 1, search.getSize());
+                    forumService.findByTitleAndContent(search.getContent(), search.getPage(), search.getSize());
+            case TAG ->
+                    forumService.findByTag(search.getContent(), search.getPage(), search.getSize());
         };
+    }
+
+    @GetMapping("/tags")
+    public List<String> findAllTags() {
+        return tagsService.findAllToString();
     }
 }
