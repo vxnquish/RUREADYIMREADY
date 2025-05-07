@@ -5,3 +5,9 @@ spring:
     openfeign:
       httpclient:
         connection-timeout: 25000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver

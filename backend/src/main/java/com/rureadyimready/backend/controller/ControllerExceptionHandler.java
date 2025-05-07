@@ -37,6 +37,12 @@ public class ControllerExceptionHandler {
         return "파일이나 데이터를 찾을 수 없습니다. 링크가 올바른지, 파일이나 데이터가 삭제되지는 않았는지 확인 부탁드립니다.";
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NullPointerException.class)
+    public String NullPointerHandler(NoSuchElementException e) {
+        return "파일이나 데이터를 찾을 수 없습니다. 링크가 올바른지, 파일이나 데이터가 삭제되지는 않았는지 확인 부탁드립니다.";
+    }
+
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     @ExceptionHandler(FeignException.class)
     public ChatResponseDTO feignException(FeignException e) {
