@@ -1,8 +1,30 @@
 #root {
-  max-width: 1280px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
+  font-family: 'Apple SD Gothic Neo', sans-serif;
+  color: #333;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+  padding: 1rem;
+  gap: 1.5rem;
+  font-size: 1.1rem;
+}
+
+nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+nav a:hover {
+  color: #e91e63;
 }
 
 .logo {
@@ -34,9 +56,15 @@
 }
 
 .card {
-  padding: 2em;
+  background-color: white;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 2rem;
+  margin: 1rem auto;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .read-the-docs {
   color: #888;
+  font-size: 0.9rem;
 }
