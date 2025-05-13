@@ -22,6 +22,9 @@ export default function Recommend() {
     if (place.includes("북촌")) return "전통 감성과 고요한 산책이 가능한 한옥마을 🏡";
     if (place.includes("광안리")) return "바다와 야경이 아름다운 낭만 명소 🌊";
     if (place.includes("제주")) return "청정 자연과 이국적인 분위기의 완벽한 휴식 🌴";
+    if (place.includes("해운대")) return "바다와 모래사장이 어우러진 부산의 대표 핫플 💕";
+    if (place.includes("경복궁")) return "역사와 낭만이 흐르는 도심 속 궁궐 데이트 👑";
+    if (place.includes("카페") || place.includes("거리")) return "감성 카페 거리에서 여유로운 데이트 ☕️";
     return "연인과 함께 하기 좋은 장소입니다.";
   };
 
@@ -32,11 +35,14 @@ export default function Recommend() {
   return (
     <div className="recommend-container">
       <h2>🗺️ 데이트 코스 추천</h2>
+      <p className="recommend-subtitle">도시를 선택하거나 입력해보세요. 연인과 즐기기 좋은 장소를 추천해드립니다!</p>
+
       <div className="locations">
         {locationOptions.map((loc, i) => (
           <button key={i} onClick={() => setLocation(loc)}>{loc}</button>
         ))}
       </div>
+
       <div className="input-group">
         <input
           value={location}

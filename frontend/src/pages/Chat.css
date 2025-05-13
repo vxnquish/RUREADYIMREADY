@@ -92,3 +92,24 @@
 .history small {
   color: #999;
 }
+
+.spinner-wrapper {
+  text-align: center;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  color: #777;
+}
+
+.spinner {
+  margin: 0 auto 0.5rem;
+  width: 36px;
+  height: 36px;
+  border: 4px solid #f8bbd0;
+  border-top: 4px solid #e91e63;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
