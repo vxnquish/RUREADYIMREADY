@@ -1,0 +1,39 @@
+.forum-write {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.forum-write h2 {
+  margin-bottom: 1rem;
+}
+
+.forum-write input[type="text"],
+.forum-write textarea {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  resize: vertical;
+}
+
+.forum-write textarea {
+  height: 200px;
+}
+
+.forum-write button {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.forum-write button:hover {
+  background-color: #1976D2;
+}
