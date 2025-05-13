@@ -12,10 +12,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,20 +26,35 @@ public class ForumServiceImpl implements ForumService {
 
     @Transactional(readOnly = false)
     public ForumContent save(ForumContentDTO data) {
-        List<Tags> tags = tagsRepository.findByValueIn(data.getTags());
-        if (tags.size() != data.getTags().size())
-            throw new NoSuchElementException("존재하지 않는 태그가 있습니다.");
+        List<String> tagValues = data.getTags();
+
         ForumContent entity = data.toEntity();
+
+        // 태그가 없는 경우: 빈 리스트 설정 후 저장
+        if (tagValues == null || tagValues.isEmpty()) {
+            entity.setForumTags(List.of());
+            return forumRepository.save(entity);
+        }
+
+        // 태그가 있는 경우: 유효성 검증
+        List<Tags> tags = tagsRepository.findByValueIn(tagValues);
+        if (tags.size() != tagValues.size()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 태그가 있습니다.");
+        }
+
         entity.setForumTags(tags.stream()
-                .map(tag -> ForumTags.builder().forumContent(entity).tags(tag).build())
+                .map(tag -> ForumTags.builder()
+                        .forumContent(entity)
+                        .tags(tag)
+                        .build())
                 .toList());
+
         return forumRepository.save(entity);
     }
 
     public ForumContent findById(long id) {
-        Optional<ForumContent> result = forumRepository.findByIdWithTags(id);
-        if (result.isPresent()) return result.get();
-        else throw new NoSuchElementException(id + "번 게시글이 없습니다.");
+        return forumRepository.findByIdWithTags(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, id + "번 게시글이 없습니다."));
     }
 
     public ForumResultDTO findAll(int page, int size) {
@@ -57,15 +72,7 @@ public class ForumServiceImpl implements ForumService {
                 PageRequest.of(page - 1, size, Sort.by("createdAt").descending())));
     }
 
-    /**
-     * 하나의 문자열에 대해 제목과 분문 모두 검사
-     * @param content 검색 대상 문자열
-     * @param page 페이지 수
-     * @param size 페이지 크기
-     * @return 검색 결과
-     */
-    public ForumResultDTO findByTitleAndContent
-            (String content, int page, int size) {
+    public ForumResultDTO findByTitleAndContent(String content, int page, int size) {
         return new ForumResultDTO(forumRepository.findByTitleContainingAndContentContaining(content,
                 PageRequest.of(page - 1, size, Sort.by("createdAt").descending())));
     }
